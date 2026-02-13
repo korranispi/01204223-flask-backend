@@ -100,4 +100,5 @@ describe('TodoItem', () => {
     // ตรวจว่า callback ถูกเรียกด้วยค่าที่ถูกต้อง
     expect(onAddNewComment).toHaveBeenCalledWith(baseTodo.id, 'New comment');
   });
+  
 });
