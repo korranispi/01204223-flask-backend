@@ -25,6 +25,13 @@ function TodoItem({ todo, toggleDone, deleteTodo, addNewComment }) {
       )}
 
       <div className="new-comment-forms">
+        {/* ✅ textbox ที่ test หา */}
+        <input
+          type="text"
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+        />
+
         <button
           onClick={() => {
             addNewComment(todo.id, newComment);

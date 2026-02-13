@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
-import { expect } from 'vitest'
+import userEvent from '@testing-library/user-event'
+import { expect, vi } from 'vitest'
 import TodoItem from './TodoItem.jsx'
 
 const baseTodo = {
@@ -46,5 +47,57 @@ describe('TodoItem', () => {
 
     render(<TodoItem todo={todoWithComment} />);
     expect(screen.queryByText('No comments')).not.toBeInTheDocument();
+  });
+  it('makes callback to toggleDone when Toggle button is clicked', () => {
+    const onToggleDone = vi.fn();
+    render(
+      <TodoItem 
+       todo={baseTodo} 
+       toggleDone={onToggleDone} />
+    );
+    const button = screen.getByRole('button', { name: /toggle/i });
+    button.click();
+    expect(onToggleDone).toHaveBeenCalledWith(baseTodo.id);
+  });
+  it('makes callback to deleteTodo when delete button is clicked', async () => {
+    const mockDeleteTodo = vi.fn();
+  
+    render(
+      <TodoItem
+        todo={baseTodo}
+        toggleDone={vi.fn()}
+        deleteTodo={mockDeleteTodo}
+        addNewComment={vi.fn()}
+      />
+    );
+  
+    const deleteButton = screen.getByText('❌');
+    await userEvent.click(deleteButton);
+  
+    expect(mockDeleteTodo).toHaveBeenCalledTimes(1);
+    expect(mockDeleteTodo).toHaveBeenCalledWith(1);
+  });
+  it('makes callback to addNewComment when a new comment is added', async () => {
+    const onAddNewComment = vi.fn();
+  
+    render(
+      <TodoItem
+        todo={baseTodo}
+        toggleDone={vi.fn()}
+        deleteTodo={vi.fn()}
+        addNewComment={onAddNewComment}
+      />
+    );
+  
+    // พิมพ์ข้อความลงใน textbox
+    const input = screen.getByRole('textbox');
+    await userEvent.type(input, 'New comment');
+  
+    // กดปุ่ม Add Comment (หรือปุ่มที่ใช้ submit comment)
+    const button = screen.getByRole('button', { name: /add/i });
+    await userEvent.click(button);
+  
+    // ตรวจว่า callback ถูกเรียกด้วยค่าที่ถูกต้อง
+    expect(onAddNewComment).toHaveBeenCalledWith(baseTodo.id, 'New comment');
   });
 });
