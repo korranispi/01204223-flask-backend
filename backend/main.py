@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import click
 
+import os
+
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -14,10 +16,21 @@ from models import TodoItem, Comment, User, db
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todos.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['JWT_SECRET_KEY'] = 'super-secret-key'
-app.config['JWT_IDENTITY_CLAIM'] = 'sub'   # ✅ แก้ปัญหา pytest error
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'SQLALCHEMY_DATABASE_URI',
+    'sqlite:///todos.db'   
+)
+
+app.config['JWT_SECRET_KEY'] = os.getenv(
+    'JWT_SECRET_KEY',
+    'dev-secret-key'
+)
+
+app.config['JWT_IDENTITY_CLAIM'] = 'sub'
+
+@app.route('/')
+def home():
+    return "Todo API is running"
 
 db.init_app(app)
 migrate = Migrate(app, db)
