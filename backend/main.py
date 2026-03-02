@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_migrate import Migrate
+import click
+
+import os
+
 from flask_jwt_extended import (
     create_access_token,
     jwt_required,
@@ -21,7 +25,10 @@ from models import db, TodoItem, Comment, User
 app = Flask(__name__)
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://korranis_pi:4kLQfDqH@p1.secondtrain.org/korranis_pi_db1'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+    'SQLALCHEMY_DATABASE_URI',
+    'sqlite:///todos.db'   
+)
 
 app.config['JWT_SECRET_KEY'] = os.getenv(
     'JWT_SECRET_KEY',
